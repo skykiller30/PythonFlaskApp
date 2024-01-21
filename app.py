@@ -1,16 +1,18 @@
 from flask import Flask, render_template, url_for, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+import pytz
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 db = SQLAlchemy(app)
 
-class Todo(db.Model):
+class Todo(db.Model): 
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.String(200), nullable=False)
     completed = db.Column(db.Integer, default=0)
-    date_created = db.Column(db.DateTime, default=datetime.utcnow)
+    date_created = db.Column(db.Text, default=datetime.now(tz=pytz.timezone("US/Central")).strftime('%m-%d-%Y %I:%M:%S %p'))
+    
 
 def __repr__(self):
     return '<Task %r>' % self.id
@@ -18,6 +20,7 @@ def __repr__(self):
 
 @app.route('/',methods=['POST', 'GET'])
 def index():
+
     if request.method == 'POST':
         task_content = request.form['content']
         new_task = Todo(content=task_content)
