@@ -1,16 +1,15 @@
 from flask import Flask, render_template, url_for, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-
+import pytz
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 db = SQLAlchemy(app)
-
-#now = datetime.utcnow()
-now = datetime.utcnow
+#newnow = s
+#now = datetime.utcnow.strftime("%Y%m%d-%H%M%S")
 #now2 = now.strftime('%a %d %b %Y, %I:%M%p')
-
+cst_timezone = pytz.timezone('America/Chicago')
 
 
 class Todo(db.Model):
@@ -19,7 +18,7 @@ class Todo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.String(200), nullable=False)
     completed = db.Column(db.Integer, default=0)
-    date_created = db.Column(db.Text, default=now)
+    date_created = db.Column(db.Text, nullable=False)
     
 
 def __repr__(self):
@@ -29,9 +28,13 @@ def __repr__(self):
 @app.route('/',methods=['POST', 'GET'])
 def index():
 
+
     if request.method == 'POST':
+        now = datetime.now(cst_timezone).strftime('%A %B %d, %Y @ %I:%M%p')
+        
         task_content = request.form['content']
-        new_task = Todo(content=task_content)
+
+        new_task = Todo(content=task_content, date_created=now)
 
         try:
             db.session.add(new_task)
